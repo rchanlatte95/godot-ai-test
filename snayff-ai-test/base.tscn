@@ -1,4 +1,7 @@
-[gd_scene format=3 uid="uid://dvafunx54qqqm"]
+[gd_scene load_steps=3 format=3 uid="uid://dvafunx54qqqm"]
+
+[ext_resource type="FontFile" uid="uid://cow454xevasx7" path="res://FiraCode-Retina.ttf" id="1_e8nri"]
+[ext_resource type="Script" path="res://diagnostics.gd" id="1_jqxe1"]
 
 [node name="base" type="Node2D"]
 
@@ -14,6 +17,49 @@ offset_bottom = 882.0
 [node name="DiagnosticAspectRatio" type="AspectRatioContainer" parent="UI_Manager"]
 layout_mode = 1
 anchors_preset = -1
-anchor_right = 0.32
-anchor_bottom = 0.18
+anchor_right = 1.0
+anchor_bottom = 0.1
+ratio = 18.0
 stretch_mode = 0
+alignment_horizontal = 0
+alignment_vertical = 0
+script = ExtResource("1_jqxe1")
+
+[node name="DiagnosticPanel" type="Panel" parent="UI_Manager/DiagnosticAspectRatio"]
+layout_mode = 2
+
+[node name="DiagnosticGridContainer" type="GridContainer" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.01
+anchor_top = 0.05
+anchor_right = 0.99
+anchor_bottom = 0.95
+offset_left = 0.64
+offset_top = -0.266667
+offset_right = 0.359985
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 4
+columns = 2
+
+[node name="DiagnosticTimingStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel/DiagnosticGridContainer"]
+custom_minimum_size = Vector2(180, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 2
+theme_override_fonts/font = ExtResource("1_e8nri")
+theme_override_font_sizes/font_size = 18
+text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus iaculis est, at iaculis turpis tempus vel. Duis in velit sed felis ultricies porttitor. Integer risus massa, hendrerit sit amet nisl at, dignissim consequat leo. Aliquam scelerisque tincidunt molestie. Aliquam erat volutpat. Donec id tempor dui. Aliquam aliquam nisl elit, a tincidunt velit placerat sit amet."
+autowrap_mode = 2
+text_overrun_behavior = 2
+
+[node name="DiagnosticMemoryStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel/DiagnosticGridContainer"]
+custom_minimum_size = Vector2(180, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 2
+theme_override_fonts/font = ExtResource("1_e8nri")
+theme_override_font_sizes/font_size = 18
+text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus iaculis est, at iaculis turpis tempus vel. Duis in velit sed felis ultricies porttitor. Integer risus massa, hendrerit sit amet nisl at, dignissim consequat leo. Aliquam scelerisque tincidunt molestie. Aliquam erat volutpat. Donec id tempor dui. Aliquam aliquam nisl elit, a tincidunt velit placerat sit amet."
+autowrap_mode = 2
+text_overrun_behavior = 2
