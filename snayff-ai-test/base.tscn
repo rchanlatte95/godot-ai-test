@@ -1,3 +1,19 @@
 [gd_scene format=3 uid="uid://dvafunx54qqqm"]
 
-[node name="Node2D" type="Node2D"]
+[node name="base" type="Node2D"]
+
+[node name="UI_Manager" type="Control" parent="."]
+custom_minimum_size = Vector2(1536, 864)
+layout_mode = 3
+anchors_preset = 0
+offset_left = 32.0
+offset_top = 18.0
+offset_right = 1568.0
+offset_bottom = 882.0
+
+[node name="DiagnosticAspectRatio" type="AspectRatioContainer" parent="UI_Manager"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.32
+anchor_bottom = 0.18
+stretch_mode = 0
