@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://dvafunx54qqqm"]
+[gd_scene load_steps=5 format=3 uid="uid://dvafunx54qqqm"]
 
 [ext_resource type="FontFile" uid="uid://cow454xevasx7" path="res://FiraCode-Retina.ttf" id="1_e8nri"]
 [ext_resource type="Script" path="res://diagnostics.gd" id="1_jqxe1"]
+[ext_resource type="Script" path="res://physics_scene.gd" id="3_boxhb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tgl7e"]
+size = Vector2(1742, 1056)
 
 [node name="base" type="Node2D"]
 
@@ -14,7 +18,7 @@ offset_top = 18.0
 offset_right = 1568.0
 offset_bottom = 882.0
 
-[node name="DiagnosticAspectRatio" type="AspectRatioContainer" parent="UI_Manager" node_paths=PackedStringArray("TimeStats", "MemStats")]
+[node name="DiagnosticAspectRatio" type="AspectRatioContainer" parent="UI_Manager" node_paths=PackedStringArray("TimeStats", "MemStats", "PhysicsTimeStats")]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -24,9 +28,10 @@ stretch_mode = 0
 alignment_horizontal = 0
 alignment_vertical = 0
 script = ExtResource("1_jqxe1")
-MilisecondsPerUpdate = 125
+MilisecondsPerUpdate = 66
 TimeStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticTimeStats")
 MemStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticMemoryStats")
+PhysicsTimeStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticPhysicsTimeStats")
 
 [node name="DiagnosticPanel" type="PanelContainer" parent="UI_Manager/DiagnosticAspectRatio"]
 self_modulate = Color(1, 1, 1, 0.25098)
@@ -86,3 +91,15 @@ vertical_alignment = 1
 autowrap_mode = 2
 text_overrun_behavior = 2
 max_lines_visible = 1
+
+[node name="scn" type="Node2D" parent="."]
+
+[node name="PhysicsScene" type="Node2D" parent="scn"]
+script = ExtResource("3_boxhb")
+
+[node name="Area2D" type="Area2D" parent="scn/PhysicsScene"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="scn/PhysicsScene/Area2D"]
+z_as_relative = false
+position = Vector2(800, 450)
+shape = SubResource("RectangleShape2D_tgl7e")

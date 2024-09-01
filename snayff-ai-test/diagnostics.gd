@@ -3,6 +3,7 @@ extends AspectRatioContainer
 @export_range (1, 500) var MilisecondsPerUpdate: int
 @export var TimeStats: Label
 @export var MemStats: Label
+@export var PhysicsTimeStats: Label
 
 const MILISECS_PER_SEC: int = 1000
 const MILISECS_TO_SECS: float = 1.0 / MILISECS_PER_SEC
@@ -17,7 +18,7 @@ var file_buffer: PackedFloat32Array
 var accum: float = 0.0
 
 var avg_buffer_idx: int = 0
-var TARGET_LOW_FRAME_CT: int = 16
+var TARGET_LOW_FRAME_CT: int = 50
 var AVG_BUFFER_SIZE: int = (int)(TARGET_LOW_FRAME_CT / LOWEST_PCT_RANGE)
 
 var avg_buffer: PackedFloat32Array
@@ -40,7 +41,7 @@ var stat_id_str: String = "%X" % [stat_id]
 const file_fmt: String = "res://%s_%s_timingStats.txt"
 const time_fmt: String = "%8.2f FPS, %0.2f ms | LOWEST: %0.2f FPS, %0.2f ms | AVERAGE: %8.2f FPS, %0.2f ms | 5%% LOW: %0.2f FPS, %0.2f ms | LOWEST 0.5%%: %0.2f FPS, %0.2f ms"
 const mem_fmt: String = "%d Draw Calls | %0.2f MB Alloc, %0.2f MB Used | Video Mem %0.2f Used, Textures %0.2f MB Used, Render Buffer %0.2f MB Used, Misc %0.2f MB Used"
-const physics_time_fmt: String = "%8.2f FPS, %0.2f ms | LOWEST: %0.2f FPS, %0.2f ms | AVERAGE: %8.2f FPS, %0.2f ms | 5%% LOW: %0.2f FPS, %0.2f ms | LOWEST 0.5%%: %0.2f FPS, %0.2f ms"
+const physics_time_fmt: String = "PHYSICS: %8.2f FPS, %0.2f ms | LOWEST: %0.2f FPS, %0.2f ms | AVERAGE: %8.2f FPS, %0.2f ms | 5%% LOW: %0.2f FPS, %0.2f ms | LOWEST 0.5%%: %0.2f FPS, %0.2f ms"
 
 # Instead of 1% low FPS, we're doing a weighted average on the lowest 5%
 func LowestFpsWeightedAverage(low_frames: PackedFloat32Array) -> float:
@@ -170,6 +171,9 @@ func DisplayTimeStats() -> void:
 
 func DisplayPhysicsTimeStats() -> void:
 	var delta: float = Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)
+	if (delta <= 0.000001): 
+		PhysicsTimeStats.text = "PHYSICS: No Physics simulated this frame."
+	
 	var fps: float = 1.0 / delta
 	var ms_per_frame: float = 1000.0 * delta
 	var lowest_ms_per_frame: float = 1000.0 / lowest_fps
@@ -182,11 +186,12 @@ func DisplayPhysicsTimeStats() -> void:
 							 trim_avg_fps, trim_ms_per_frame,
 							 low_avg_fps, low_avg_ms_per_frame,
 							 lowest_avg_fps, lowest_avg_ms_per_frame]
-	TimeStats.text = final_str
+	PhysicsTimeStats.text = final_str
 
 func _ready() -> void:
 	TimeStats.text = ""
 	MemStats.text = ""
+	PhysicsTimeStats.text = ""
 	
 	avg_buffer.resize(AVG_BUFFER_SIZE)
 	avg_physics_buffer.resize(AVG_BUFFER_SIZE)
@@ -212,6 +217,7 @@ func _process(delta: float) -> void:
 	
 	if (avg_buffer_idx >= AVG_BUFFER_SIZE):
 		TabulateTimeStats()
+		TabulatePhysicsTimeStats()
 		
 		auto_flush_ctr += 1
 		if (auto_flush_ctr >= AUTO_FLUSH_MAX):
@@ -222,7 +228,14 @@ func _process(delta: float) -> void:
 	if (accum >= update_threshold):
 		DisplayTimeStats()
 		DisplayMemStats()
+		DisplayPhysicsTimeStats()
 		accum = 0.0
 
 func _physics_process(delta: float) -> void:
-	pass
+	
+	if (accum < 0.0):
+		return
+	
+	var fps: float = 1.0 / delta
+	physics_lowest_fps = fps if fps < physics_lowest_fps else physics_lowest_fps
+	avg_physics_buffer[avg_buffer_idx] = fps
