@@ -19,16 +19,18 @@ const LOWEST_PCT_RANGE: float = 0.05
 var file_buffer: PackedFloat32Array
 
 var avg_buffer_idx: int = 0
-var TARGET_LOW_FRAME_CT: int = 10
+var TARGET_LOW_FRAME_CT: int = 16
 var AVG_BUFFER_SIZE: int = (int)(TARGET_LOW_FRAME_CT / LOWEST_PCT_RANGE)
 var avg_buffer: PackedFloat32Array
 var lowest_fps: float = 1000.0 * 1000.0
 var accum: float = 0.0
+var low_avg_fps: float = 0.0
 var lowest_avg_fps: float = 0.0
 var trim_avg_fps: float = 0.0
 
-var current_fps_fmt = "%10.3f FPS | LOWEST FPS: %6.3f | AVERAGE FPS: %10.3f | 5%% LOW FPS: %6.3f"
+var current_fps_fmt = "%10.3f FPS | LOWEST: %6.3f FPS | AVERAGE: %10.3f FPS | 5%% LOW: %6.3f FPS | LOWEST 0.5%%: %6.3f FPS"
 
+# Instead of 1% low FPS, we're doing a weighted average on the lowest 5%
 func CalculateLowestFPSWeightedAverage(low_frames: PackedFloat32Array) -> float:
 	var avg: float = 0.0
 	var half_frame_ct = TARGET_LOW_FRAME_CT / 2
@@ -57,30 +59,13 @@ func CalculateTrimmedFpsAverage(trimmed_frames: PackedFloat32Array) -> float:
 		avg += frame_time
 	return avg / trimmed_frames.size()
 
-# Instead of 1% low FPS, we're doing a weighted average on the lowest 5%
-func TabulateTimeStatistics(delta: float) -> void:
-	
-	var fps: float = 1.0 / delta
-	avg_buffer[avg_buffer_idx] = fps
-	avg_buffer_idx = avg_buffer_idx + 1
-	lowest_fps = fps if fps < lowest_fps else lowest_fps
-	
-	if (avg_buffer_idx >= AVG_BUFFER_SIZE):
-		avg_buffer_idx = 0
-		avg_buffer.sort()
-		lowest_avg_fps = CalculateLowestFPSWeightedAverage(avg_buffer.slice(0, TARGET_LOW_FRAME_CT))
-		trim_avg_fps = CalculateTrimmedFpsAverage(avg_buffer.slice(TARGET_LOW_FRAME_CT, (AVG_BUFFER_SIZE - TARGET_LOW_FRAME_CT)))
-		avg_buffer.fill(0.0)
-	else:
-		
-		accum += delta
-		if (accum <= 0.1):
-			return
-		accum = 0.0
-		
-		var final_str = current_fps_fmt % [fps, lowest_fps, trim_avg_fps, lowest_avg_fps]
-		TimeStats.text = final_str
-	
+func TabulateTimeStats(fps: float) -> void:
+	avg_buffer_idx = 0
+	avg_buffer.sort()
+	lowest_avg_fps = avg_buffer[0]
+	low_avg_fps = CalculateLowestFPSWeightedAverage(avg_buffer.slice(0, TARGET_LOW_FRAME_CT))
+	trim_avg_fps = CalculateTrimmedFpsAverage(avg_buffer.slice(TARGET_LOW_FRAME_CT, (AVG_BUFFER_SIZE - TARGET_LOW_FRAME_CT)))
+	avg_buffer.fill(0.0)
 
 func _ready() -> void:
 	TimeStats.text = ""
@@ -91,8 +76,24 @@ func _ready() -> void:
 	var file_buffer_sz: int = MinutesToTrack * SECS_PER_MIN
 	file_buffer.resize(file_buffer_sz)
 	
+	accum = -5.0
 	pass
 
 func _process(delta: float) -> void:
-	TabulateTimeStatistics(delta)
-	pass
+	
+	accum += delta
+	if (accum < 0.0):
+		return
+
+	var fps: float = 1.0 / delta
+	avg_buffer[avg_buffer_idx] = fps
+	avg_buffer_idx = avg_buffer_idx + 1
+	lowest_fps = fps if fps < lowest_fps else lowest_fps
+	
+	if (avg_buffer_idx >= AVG_BUFFER_SIZE):
+		TabulateTimeStats(fps)
+	
+	if (accum >= 0.08333):
+		var final_str = current_fps_fmt % [fps, lowest_fps, trim_avg_fps, low_avg_fps, lowest_avg_fps]
+		TimeStats.text = final_str
+		accum = 0.0

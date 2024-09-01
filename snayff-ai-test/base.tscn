@@ -29,7 +29,7 @@ MemStats = NodePath("DiagnosticGridContainer/DiagnosticMemoryStats")
 MinutesToTrack = 15
 
 [node name="DiagnosticPanel" type="Panel" parent="UI_Manager/DiagnosticAspectRatio"]
-modulate = Color(1, 1, 1, 0.501961)
+self_modulate = Color(1, 1, 1, 0.25098)
 layout_mode = 2
 
 [node name="DiagnosticGridContainer" type="GridContainer" parent="UI_Manager/DiagnosticAspectRatio"]
