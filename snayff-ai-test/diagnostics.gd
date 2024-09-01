@@ -2,7 +2,6 @@ extends AspectRatioContainer
 
 @export var TimeStats: Label
 @export var MemStats: Label
-@export_range(5, 30) var MinutesToTrack: int
 
 const MAX_FPS: int = 999
 const TARGET_FPS: int = 72
@@ -28,14 +27,13 @@ var low_avg_fps: float = 0.0
 var lowest_avg_fps: float = 0.0
 var trim_avg_fps: float = 0.0
 
-const AUTO_FLUSH_MAX: int = 10
+const AUTO_FLUSH_MAX: int = 100
 var auto_flush_ctr: int = 0
 
 var stat_id: int = randi()
 var stat_id_str: String = "%X" % [stat_id]
 const file_fmt: String = "res://%s_%s_timingStats.txt"
-const fps_fmt: String = "%8.2f FPS | LOWEST: %0.2f FPS | AVERAGE: %8.2f FPS | 5%% LOW: %0.2f FPS | LOWEST 0.5%%: %0.2f FPS"
-const ms_fmt: String = "%0.2f ms | LOWEST: %0.2f ms | AVERAGE: %0.2f ms | 5%% LOW: %0.2f ms | LOWEST 0.5%%: %0.2f ms"
+const time_fmt: String = "%8.2f FPS, %0.2f ms | LOWEST: %0.2f FPS, %0.2f ms | AVERAGE: %8.2f FPS, %0.2f ms | 5%% LOW: %0.2f FPS, %0.2f ms | LOWEST 0.5%%: %0.2f FPS, %0.2f ms"
 
 # Instead of 1% low FPS, we're doing a weighted average on the lowest 5%
 func LowestFpsWeightedAverage(low_frames: PackedFloat32Array) -> float:
@@ -75,6 +73,19 @@ func ResetStatCollection() -> void:
 	lowest_fps = 10000000000.0
 	print("RESET DEBUG STAT COLLECTION")
 
+func CreateStatsFile() -> void:
+	var fn: String = file_fmt % [Time.get_date_string_from_system(), stat_id_str]
+	var file = FileAccess.open(fn, FileAccess.WRITE_READ)
+	var data: String = "%d" % AVG_BUFFER_SIZE
+	file.store_line(data)
+	file.close()
+	
+	if (FileAccess.file_exists(fn)):
+		print("STATS FILE CREATED: " + fn)
+	else:
+		printerr("FAILED TO CREATE STATS FILE: " + fn)
+		get_tree().quit()
+
 func FlushStatsToFile() -> void:
 	var fn: String = file_fmt % [Time.get_date_string_from_system(), stat_id_str]
 	
@@ -83,9 +94,10 @@ func FlushStatsToFile() -> void:
 		file = FileAccess.open(fn, FileAccess.READ_WRITE)
 		file.seek_end()
 	else:
-		file = FileAccess.open(fn, FileAccess.WRITE_READ)
+		CreateStatsFile()
+		file = FileAccess.open(fn, FileAccess.READ_WRITE)
 
-	var fmt_str: String = "%.3f "
+	var fmt_str: String = "%.2f "
 	var data: String = fmt_str % [lowest_fps]
 	
 	for fps: float in avg_buffer:
@@ -94,18 +106,16 @@ func FlushStatsToFile() -> void:
 	file.store_line(data)
 	file.close()
 	
-	print("STATS FLUSHED TO FILE!")
+	print("STATS FLUSHED TO FILE: " + fn)
 
 func _ready() -> void:
 	TimeStats.text = ""
 	MemStats.text = ""
 	
 	avg_buffer.resize(AVG_BUFFER_SIZE)
-	
-	var file_buffer_sz: int = MinutesToTrack * SECS_PER_MIN
-	file_buffer.resize(file_buffer_sz)
-	
 	accum = -1.0
+	
+	CreateStatsFile()
 
 func _input(event):
 	# Ctrl+Del
@@ -133,14 +143,16 @@ func _process(delta: float) -> void:
 			auto_flush_ctr = 0
 	
 	if (accum >= 0.08333):
-		var fps_str = fps_fmt % [fps, lowest_fps, trim_avg_fps, low_avg_fps, lowest_avg_fps]
-		
-		var ms_per_frame: float = 1000.0 / fps
+		var ms_per_frame: float = 1000.0 * delta
 		var lowest_ms_per_frame: float = 1000.0 / lowest_fps
 		var trim_ms_per_frame: float = 1000.0 / trim_avg_fps
 		var low_avg_ms_per_frame: float = 1000.0 / low_avg_fps
 		var lowest_avg_ms_per_frame: float = 1000.0 / lowest_avg_fps
-		var ms_str = ms_fmt % [ms_per_frame, lowest_ms_per_frame, trim_ms_per_frame, low_avg_ms_per_frame, lowest_avg_ms_per_frame]
-		var final_str = fps_str + " | " + ms_str
+		
+		var final_str = time_fmt % [fps, ms_per_frame,
+								 lowest_fps, lowest_ms_per_frame,
+								 trim_avg_fps, trim_ms_per_frame,
+								 low_avg_fps, low_avg_ms_per_frame,
+								 lowest_avg_fps, lowest_avg_ms_per_frame]
 		TimeStats.text = final_str
 		accum = 0.0

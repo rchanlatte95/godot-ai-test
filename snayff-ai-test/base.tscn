@@ -18,54 +18,57 @@ offset_bottom = 882.0
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
-anchor_bottom = 0.1
+anchor_bottom = 0.035
 ratio = 18.0
 stretch_mode = 0
 alignment_horizontal = 0
 alignment_vertical = 0
 script = ExtResource("1_jqxe1")
-TimeStats = NodePath("MarginContainer/DiagnosticGridContainer/DiagnosticTimingStats")
-MemStats = NodePath("MarginContainer/DiagnosticGridContainer/DiagnosticMemoryStats")
-MinutesToTrack = 15
+TimeStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticTimingStats")
+MemStats = NodePath("")
 
-[node name="DiagnosticPanel" type="Panel" parent="UI_Manager/DiagnosticAspectRatio"]
+[node name="DiagnosticPanel" type="PanelContainer" parent="UI_Manager/DiagnosticAspectRatio"]
 self_modulate = Color(1, 1, 1, 0.25098)
 layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="UI_Manager/DiagnosticAspectRatio"]
+[node name="MarginContainer" type="MarginContainer" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 5
 
-[node name="DiagnosticGridContainer" type="GridContainer" parent="UI_Manager/DiagnosticAspectRatio/MarginContainer"]
+[node name="DiagnosticContainer" type="VBoxContainer" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel/MarginContainer"]
 layout_direction = 2
 layout_mode = 2
+alignment = 1
 
-[node name="DiagnosticTimingStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/MarginContainer/DiagnosticGridContainer"]
-custom_minimum_size = Vector2(180, 50)
+[node name="DiagnosticTimingStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel/MarginContainer/DiagnosticContainer"]
+custom_minimum_size = Vector2(1440, 20)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("1_e8nri")
-theme_override_font_sizes/font_size = 12
-text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus iaculis est, at iaculis turpis tempus vel. Duis in velit sed felis ultricies porttitor. Integer risus massa, hendrerit sit amet nisl at, dignissim consequat leo. Aliquam scelerisque tincidunt molestie. Aliquam erat volutpat. Donec id tempor dui. Aliquam aliquam nisl elit, a tincidunt velit placerat sit amet."
+theme_override_font_sizes/font_size = 14
+text = "XXXX.xx FPS, XXX.xx ms | LOWEST: XXX.xx FPS, XXX.xx ms | AVERAGE: XXXX.xx FPS, XXX.xx ms | 5%% LOW: XXX.xx FPS, XXX.xx ms | LOWEST 0.5%: XXX.xx FPS, XXX.xx ms"
+vertical_alignment = 1
 autowrap_mode = 2
 text_overrun_behavior = 2
-max_lines_visible = 2
+max_lines_visible = 1
 
-[node name="DiagnosticMemoryStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/MarginContainer/DiagnosticGridContainer"]
-visible = false
-custom_minimum_size = Vector2(180, 24)
+[node name="DiagnosticMemoryStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel/MarginContainer/DiagnosticContainer"]
+custom_minimum_size = Vector2(1440, 20)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("1_e8nri")
-theme_override_font_sizes/font_size = 18
-text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus iaculis est, at iaculis turpis tempus vel. Duis in velit sed felis ultricies porttitor. Integer risus massa, hendrerit sit amet nisl at, dignissim consequat leo. Aliquam scelerisque tincidunt molestie. Aliquam erat volutpat. Donec id tempor dui. Aliquam aliquam nisl elit, a tincidunt velit placerat sit amet."
+theme_override_font_sizes/font_size = 14
+text = "XXXX.xx FPS, XXX.xx ms | LOWEST: XXX.xx FPS, XXX.xx ms | AVERAGE: XXXX.xx FPS, XXX.xx ms | 5%% LOW: XXX.xx FPS, XXX.xx ms | LOWEST 0.5%: XXX.xx FPS, XXX.xx ms"
+vertical_alignment = 1
 autowrap_mode = 2
 text_overrun_behavior = 2
 max_lines_visible = 1
