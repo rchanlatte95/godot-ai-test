@@ -25,7 +25,7 @@ alignment_horizontal = 0
 alignment_vertical = 0
 script = ExtResource("1_jqxe1")
 TimeStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticTimingStats")
-MemStats = NodePath("")
+MemStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticMemoryStats")
 
 [node name="DiagnosticPanel" type="PanelContainer" parent="UI_Manager/DiagnosticAspectRatio"]
 self_modulate = Color(1, 1, 1, 0.25098)
@@ -67,7 +67,7 @@ size_flags_vertical = 0
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("1_e8nri")
 theme_override_font_sizes/font_size = 14
-text = "XXXX.xx FPS, XXX.xx ms | LOWEST: XXX.xx FPS, XXX.xx ms | AVERAGE: XXXX.xx FPS, XXX.xx ms | 5%% LOW: XXX.xx FPS, XXX.xx ms | LOWEST 0.5%: XXX.xx FPS, XXX.xx ms"
+text = "XXXX.xx KBytes In Use"
 vertical_alignment = 1
 autowrap_mode = 2
 text_overrun_behavior = 2

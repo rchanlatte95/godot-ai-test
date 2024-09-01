@@ -34,6 +34,7 @@ var stat_id: int = randi()
 var stat_id_str: String = "%X" % [stat_id]
 const file_fmt: String = "res://%s_%s_timingStats.txt"
 const time_fmt: String = "%8.2f FPS, %0.2f ms | LOWEST: %0.2f FPS, %0.2f ms | AVERAGE: %8.2f FPS, %0.2f ms | 5%% LOW: %0.2f FPS, %0.2f ms | LOWEST 0.5%%: %0.2f FPS, %0.2f ms"
+const mem_fmt: String = "%d Draw Calls | %0.2f MB Alloc, %0.2f MB Used | Video Mem %0.2f Used, Textures %0.2f MB Used, Render Buffer %0.2f MB Used, Misc %0.2f MB Used"
 
 # Instead of 1% low FPS, we're doing a weighted average on the lowest 5%
 func LowestFpsWeightedAverage(low_frames: PackedFloat32Array) -> float:
@@ -108,6 +109,50 @@ func FlushStatsToFile() -> void:
 	
 	print("STATS FLUSHED TO FILE: " + fn)
 
+func DisplayMemStats() -> void:
+	
+	const BYTES_TO_MB: float = 1.0 / 1048576.0
+	
+	var draw_calls: int = ceil(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
+	
+	# Available static memory.
+	var static_mem_alloc: float = Performance.get_monitor(Performance.MEMORY_STATIC_MAX)
+	# Static memory currently used, in bytes.
+	var static_mem_used: float = Performance.get_monitor(Performance.MEMORY_STATIC)
+	# The amount of video memory used (texture and vertex memory combined, in bytes). Since this metric also includes miscellaneous allocations, this value is always greater than the sum of RENDER_TEXTURE_MEM_USED and RENDER_BUFFER_MEM_USED.
+	var total_video_mem_used: float = Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)
+	# The amount of texture memory used (in bytes).
+	var tex_mem_used: float = Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED)
+	# The amount of render buffer memory used (in bytes).
+	var render_buffer_mem_used: float = Performance.get_monitor(Performance.RENDER_BUFFER_MEM_USED)
+	var misc_gfx_mem_used: float = total_video_mem_used - (tex_mem_used + render_buffer_mem_used)
+	
+	static_mem_alloc *= BYTES_TO_MB
+	static_mem_used *= BYTES_TO_MB
+	total_video_mem_used *= BYTES_TO_MB
+	tex_mem_used *= BYTES_TO_MB
+	render_buffer_mem_used *= BYTES_TO_MB
+	misc_gfx_mem_used *= BYTES_TO_MB
+	var final_str = mem_fmt % [draw_calls, 
+							static_mem_alloc, static_mem_used, 
+							total_video_mem_used, tex_mem_used, render_buffer_mem_used, misc_gfx_mem_used]
+	MemStats.text = final_str
+
+func DisplayTimeStats(delta: float) -> void:
+	var fps: float = 1.0 / delta
+	var ms_per_frame: float = 1000.0 * delta
+	var lowest_ms_per_frame: float = 1000.0 / lowest_fps
+	var trim_ms_per_frame: float = 1000.0 / trim_avg_fps
+	var low_avg_ms_per_frame: float = 1000.0 / low_avg_fps
+	var lowest_avg_ms_per_frame: float = 1000.0 / lowest_avg_fps
+	
+	var final_str = time_fmt % [fps, ms_per_frame,
+							 lowest_fps, lowest_ms_per_frame,
+							 trim_avg_fps, trim_ms_per_frame,
+							 low_avg_fps, low_avg_ms_per_frame,
+							 lowest_avg_fps, lowest_avg_ms_per_frame]
+	TimeStats.text = final_str
+
 func _ready() -> void:
 	TimeStats.text = ""
 	MemStats.text = ""
@@ -134,7 +179,6 @@ func _process(delta: float) -> void:
 	lowest_fps = fps if fps < lowest_fps else lowest_fps
 	
 	if (avg_buffer_idx >= AVG_BUFFER_SIZE):
-		
 		TabulateTimeStats()
 		
 		auto_flush_ctr += 1
@@ -143,16 +187,6 @@ func _process(delta: float) -> void:
 			auto_flush_ctr = 0
 	
 	if (accum >= 0.08333):
-		var ms_per_frame: float = 1000.0 * delta
-		var lowest_ms_per_frame: float = 1000.0 / lowest_fps
-		var trim_ms_per_frame: float = 1000.0 / trim_avg_fps
-		var low_avg_ms_per_frame: float = 1000.0 / low_avg_fps
-		var lowest_avg_ms_per_frame: float = 1000.0 / lowest_avg_fps
-		
-		var final_str = time_fmt % [fps, ms_per_frame,
-								 lowest_fps, lowest_ms_per_frame,
-								 trim_avg_fps, trim_ms_per_frame,
-								 low_avg_fps, low_avg_ms_per_frame,
-								 lowest_avg_fps, lowest_avg_ms_per_frame]
-		TimeStats.text = final_str
+		DisplayTimeStats(delta)
+		DisplayMemStats()
 		accum = 0.0
