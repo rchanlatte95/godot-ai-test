@@ -14,15 +14,23 @@ const LOWEST_PCT_RANGE: float = 0.05
 
 var file_buffer: PackedFloat32Array
 
+var accum: float = 0.0
+
 var avg_buffer_idx: int = 0
 var TARGET_LOW_FRAME_CT: int = 16
 var AVG_BUFFER_SIZE: int = (int)(TARGET_LOW_FRAME_CT / LOWEST_PCT_RANGE)
+
 var avg_buffer: PackedFloat32Array
 var lowest_fps: float = 1000.0 * 1000.0
-var accum: float = 0.0
 var low_avg_fps: float = 0.0
 var lowest_avg_fps: float = 0.0
 var trim_avg_fps: float = 0.0
+
+var avg_physics_buffer: PackedFloat32Array
+var physics_lowest_fps: float = 1000.0 * 1000.0
+var physics_low_avg_fps: float = 0.0
+var physics_lowest_avg_fps: float = 0.0
+var physics_trim_avg_fps: float = 0.0
 
 const AUTO_FLUSH_MAX: int = 100
 var auto_flush_ctr: int = 0
@@ -32,6 +40,7 @@ var stat_id_str: String = "%X" % [stat_id]
 const file_fmt: String = "res://%s_%s_timingStats.txt"
 const time_fmt: String = "%8.2f FPS, %0.2f ms | LOWEST: %0.2f FPS, %0.2f ms | AVERAGE: %8.2f FPS, %0.2f ms | 5%% LOW: %0.2f FPS, %0.2f ms | LOWEST 0.5%%: %0.2f FPS, %0.2f ms"
 const mem_fmt: String = "%d Draw Calls | %0.2f MB Alloc, %0.2f MB Used | Video Mem %0.2f Used, Textures %0.2f MB Used, Render Buffer %0.2f MB Used, Misc %0.2f MB Used"
+const physics_time_fmt: String = "%8.2f FPS, %0.2f ms | LOWEST: %0.2f FPS, %0.2f ms | AVERAGE: %8.2f FPS, %0.2f ms | 5%% LOW: %0.2f FPS, %0.2f ms | LOWEST 0.5%%: %0.2f FPS, %0.2f ms"
 
 # Instead of 1% low FPS, we're doing a weighted average on the lowest 5%
 func LowestFpsWeightedAverage(low_frames: PackedFloat32Array) -> float:
@@ -66,6 +75,13 @@ func TabulateTimeStats() -> void:
 	lowest_avg_fps = avg_buffer[0]
 	low_avg_fps = LowestFpsWeightedAverage(avg_buffer.slice(0, TARGET_LOW_FRAME_CT))
 	trim_avg_fps = Average(avg_buffer.slice(TARGET_LOW_FRAME_CT, (AVG_BUFFER_SIZE - TARGET_LOW_FRAME_CT)))
+
+func TabulatePhysicsTimeStats() -> void:
+	avg_buffer_idx = 0
+	avg_physics_buffer.sort()
+	physics_lowest_fps = avg_physics_buffer[0]
+	physics_low_avg_fps = LowestFpsWeightedAverage(avg_physics_buffer.slice(0, TARGET_LOW_FRAME_CT))
+	physics_trim_avg_fps = Average(avg_physics_buffer.slice(TARGET_LOW_FRAME_CT, (AVG_BUFFER_SIZE - TARGET_LOW_FRAME_CT)))
 
 func ResetStatCollection() -> void:
 	lowest_fps = 10000000000.0
@@ -108,7 +124,8 @@ func FlushStatsToFile() -> void:
 
 func DisplayMemStats() -> void:
 	
-	const BYTES_TO_MB: float = 1.0 / 1048576.0
+	const BYTES_IN_MB: float = 1048576.0
+	const BYTES_TO_MB: float = 1.0 / BYTES_IN_MB
 	
 	var draw_calls: int = ceil(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
 	
@@ -135,7 +152,24 @@ func DisplayMemStats() -> void:
 							total_video_mem_used, tex_mem_used, render_buffer_mem_used, misc_gfx_mem_used]
 	MemStats.text = final_str
 
-func DisplayTimeStats(delta: float) -> void:
+func DisplayTimeStats() -> void:
+	var delta: float = Performance.get_monitor(Performance.TIME_PROCESS)
+	var fps: float = 1.0 / delta
+	var ms_per_frame: float = 1000.0 * delta
+	var lowest_ms_per_frame: float = 1000.0 / lowest_fps
+	var trim_ms_per_frame: float = 1000.0 / trim_avg_fps
+	var low_avg_ms_per_frame: float = 1000.0 / low_avg_fps
+	var lowest_avg_ms_per_frame: float = 1000.0 / lowest_avg_fps
+	
+	var final_str = time_fmt % [fps, ms_per_frame,
+							 lowest_fps, lowest_ms_per_frame,
+							 trim_avg_fps, trim_ms_per_frame,
+							 low_avg_fps, low_avg_ms_per_frame,
+							 lowest_avg_fps, lowest_avg_ms_per_frame]
+	TimeStats.text = final_str
+
+func DisplayPhysicsTimeStats() -> void:
+	var delta: float = Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)
 	var fps: float = 1.0 / delta
 	var ms_per_frame: float = 1000.0 * delta
 	var lowest_ms_per_frame: float = 1000.0 / lowest_fps
@@ -155,6 +189,7 @@ func _ready() -> void:
 	MemStats.text = ""
 	
 	avg_buffer.resize(AVG_BUFFER_SIZE)
+	avg_physics_buffer.resize(AVG_BUFFER_SIZE)
 	accum = -1.0
 	
 	CreateStatsFile()
@@ -185,6 +220,9 @@ func _process(delta: float) -> void:
 	
 	var update_threshold = MilisecondsPerUpdate * MILISECS_TO_SECS
 	if (accum >= update_threshold):
-		DisplayTimeStats(delta)
+		DisplayTimeStats()
 		DisplayMemStats()
 		accum = 0.0
+
+func _physics_process(delta: float) -> void:
+	pass

@@ -25,13 +25,12 @@ alignment_horizontal = 0
 alignment_vertical = 0
 script = ExtResource("1_jqxe1")
 MilisecondsPerUpdate = 125
-TimeStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticTimingStats")
+TimeStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticTimeStats")
 MemStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticMemoryStats")
 
 [node name="DiagnosticPanel" type="PanelContainer" parent="UI_Manager/DiagnosticAspectRatio"]
 self_modulate = Color(1, 1, 1, 0.25098)
 layout_mode = 2
-size_flags_horizontal = 0
 size_flags_vertical = 0
 
 [node name="MarginContainer" type="MarginContainer" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel"]
@@ -46,7 +45,7 @@ layout_direction = 2
 layout_mode = 2
 alignment = 1
 
-[node name="DiagnosticTimingStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel/MarginContainer/DiagnosticContainer"]
+[node name="DiagnosticTimeStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel/MarginContainer/DiagnosticContainer"]
 custom_minimum_size = Vector2(1440, 20)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -68,7 +67,21 @@ size_flags_vertical = 0
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("1_e8nri")
 theme_override_font_sizes/font_size = 14
-text = "XXXX.xx KBytes In Use"
+text = "XXXX Draw Calls | XXXX.X MB Alloc, XXXX.X MB Used | Video Mem XXXX.X Used, Textures XXXX.X MB Used, Render Buffer XXXX.X MB Used, Misc XXXX.X MB Used"
+vertical_alignment = 1
+autowrap_mode = 2
+text_overrun_behavior = 2
+max_lines_visible = 1
+
+[node name="DiagnosticPhysicsTimeStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticPanel/MarginContainer/DiagnosticContainer"]
+custom_minimum_size = Vector2(1440, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_e8nri")
+theme_override_font_sizes/font_size = 14
+text = "Physics: XXXX.xx FPS, XXX.xx ms | LOWEST: XXX.xx FPS, XXX.xx ms | AVERAGE: XXXX.xx FPS, XXX.xx ms | 5%% LOW: XXX.xx FPS, XXX.xx ms | LOWEST 0.5%: XXX.xx FPS, XXX.xx ms"
 vertical_alignment = 1
 autowrap_mode = 2
 text_overrun_behavior = 2
