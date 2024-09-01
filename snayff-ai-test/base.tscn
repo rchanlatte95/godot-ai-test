@@ -24,21 +24,27 @@ stretch_mode = 0
 alignment_horizontal = 0
 alignment_vertical = 0
 script = ExtResource("1_jqxe1")
-TimeStats = NodePath("DiagnosticGridContainer/DiagnosticTimingStats")
-MemStats = NodePath("DiagnosticGridContainer/DiagnosticMemoryStats")
+TimeStats = NodePath("MarginContainer/DiagnosticGridContainer/DiagnosticTimingStats")
+MemStats = NodePath("MarginContainer/DiagnosticGridContainer/DiagnosticMemoryStats")
 MinutesToTrack = 15
 
 [node name="DiagnosticPanel" type="Panel" parent="UI_Manager/DiagnosticAspectRatio"]
 self_modulate = Color(1, 1, 1, 0.25098)
 layout_mode = 2
 
-[node name="DiagnosticGridContainer" type="GridContainer" parent="UI_Manager/DiagnosticAspectRatio"]
+[node name="MarginContainer" type="MarginContainer" parent="UI_Manager/DiagnosticAspectRatio"]
 layout_mode = 2
-theme_override_constants/h_separation = 18
-theme_override_constants/v_separation = 4
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
 
-[node name="DiagnosticTimingStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticGridContainer"]
-custom_minimum_size = Vector2(180, 80)
+[node name="DiagnosticGridContainer" type="GridContainer" parent="UI_Manager/DiagnosticAspectRatio/MarginContainer"]
+layout_direction = 2
+layout_mode = 2
+
+[node name="DiagnosticTimingStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/MarginContainer/DiagnosticGridContainer"]
+custom_minimum_size = Vector2(180, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -48,13 +54,15 @@ theme_override_font_sizes/font_size = 18
 text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus iaculis est, at iaculis turpis tempus vel. Duis in velit sed felis ultricies porttitor. Integer risus massa, hendrerit sit amet nisl at, dignissim consequat leo. Aliquam scelerisque tincidunt molestie. Aliquam erat volutpat. Donec id tempor dui. Aliquam aliquam nisl elit, a tincidunt velit placerat sit amet."
 autowrap_mode = 2
 text_overrun_behavior = 2
-max_lines_visible = 1
+max_lines_visible = 2
 
-[node name="DiagnosticMemoryStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticGridContainer"]
-custom_minimum_size = Vector2(180, 80)
+[node name="DiagnosticMemoryStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/MarginContainer/DiagnosticGridContainer"]
+visible = false
+custom_minimum_size = Vector2(180, 24)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 2
+size_flags_vertical = 0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("1_e8nri")
 theme_override_font_sizes/font_size = 18
 text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus iaculis est, at iaculis turpis tempus vel. Duis in velit sed felis ultricies porttitor. Integer risus massa, hendrerit sit amet nisl at, dignissim consequat leo. Aliquam scelerisque tincidunt molestie. Aliquam erat volutpat. Donec id tempor dui. Aliquam aliquam nisl elit, a tincidunt velit placerat sit amet."

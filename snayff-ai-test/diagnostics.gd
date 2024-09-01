@@ -28,7 +28,8 @@ var low_avg_fps: float = 0.0
 var lowest_avg_fps: float = 0.0
 var trim_avg_fps: float = 0.0
 
-var current_fps_fmt = "%10.3f FPS | LOWEST: %6.3f FPS | AVERAGE: %10.3f FPS | 5%% LOW: %6.3f FPS | LOWEST 0.5%%: %6.3f FPS"
+var fps_fmt = "%10.3f FPS | LOWEST: %6.3f FPS | AVERAGE: %10.3f FPS | 5%% LOW: %6.3f FPS | LOWEST 0.5%%: %6.3f FPS"
+var ms_fmt = "%10.3f ms  | LOWEST: %6.3f ms  | AVERAGE: %10.3f ms  | 5%% LOW: %6.3f ms  | LOWEST 0.5%%: %6.3f ms "
 
 # Instead of 1% low FPS, we're doing a weighted average on the lowest 5%
 func CalculateLowestFPSWeightedAverage(low_frames: PackedFloat32Array) -> float:
@@ -80,6 +81,7 @@ func _ready() -> void:
 	file_buffer.resize(file_buffer_sz)
 
 func _input(event):
+	# Ctrl+Del
 	if event.is_action_pressed("ui_text_delete_word"):
 		ResetStatCollection()
 
@@ -98,6 +100,14 @@ func _process(delta: float) -> void:
 		TabulateTimeStats()
 	
 	if (accum >= 0.08333):
-		var final_str = current_fps_fmt % [fps, lowest_fps, trim_avg_fps, low_avg_fps, lowest_avg_fps]
+		var fps_str = fps_fmt % [fps, lowest_fps, trim_avg_fps, low_avg_fps, lowest_avg_fps]
+		
+		var ms_per_frame: float = 1000.0 / fps
+		var lowest_ms_per_frame: float = 1000.0 / lowest_fps
+		var trim_ms_per_frame: float = 1000.0 / trim_avg_fps
+		var low_avg_ms_per_frame: float = 1000.0 / low_avg_fps
+		var lowest_avg_ms_per_frame: float = 1000.0 / lowest_avg_fps
+		var ms_str = ms_fmt % [ms_per_frame, lowest_ms_per_frame, trim_ms_per_frame, low_avg_ms_per_frame, lowest_avg_ms_per_frame]
+		var final_str = fps_str + '\n' + ms_str
 		TimeStats.text = final_str
 		accum = 0.0
