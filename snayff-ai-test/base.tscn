@@ -24,6 +24,7 @@ stretch_mode = 0
 alignment_horizontal = 0
 alignment_vertical = 0
 script = ExtResource("1_jqxe1")
+MilisecondsPerUpdate = 125
 TimeStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticTimingStats")
 MemStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticMemoryStats")
 

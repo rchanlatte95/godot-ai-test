@@ -1,17 +1,14 @@
 extends AspectRatioContainer
 
+@export_range (1, 500) var MilisecondsPerUpdate: int
 @export var TimeStats: Label
 @export var MemStats: Label
 
-const MAX_FPS: int = 999
-const TARGET_FPS: int = 72
 const MILISECS_PER_SEC: int = 1000
+const MILISECS_TO_SECS: float = 1.0 / MILISECS_PER_SEC
 const SECS_PER_MIN: int = 60
 const MINS_PER_HOUR: int = 60
 const SECS_PER_HOUR: int = (SECS_PER_MIN * MINS_PER_HOUR)
-
-const MAX_FRAMES_PER_MIN: int = (MAX_FPS * SECS_PER_MIN)
-const MAX_FRAMES_PER_HOUR: int = (MAX_FPS * SECS_PER_HOUR)
 
 const LOWEST_PCT_RANGE: float = 0.05
 
@@ -186,7 +183,8 @@ func _process(delta: float) -> void:
 			FlushStatsToFile()
 			auto_flush_ctr = 0
 	
-	if (accum >= 0.08333):
+	var update_threshold = MilisecondsPerUpdate * MILISECS_TO_SECS
+	if (accum >= update_threshold):
 		DisplayTimeStats(delta)
 		DisplayMemStats()
 		accum = 0.0
