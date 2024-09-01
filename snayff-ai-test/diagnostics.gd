@@ -28,11 +28,17 @@ var low_avg_fps: float = 0.0
 var lowest_avg_fps: float = 0.0
 var trim_avg_fps: float = 0.0
 
-var fps_fmt = "%10.3f FPS | LOWEST: %6.3f FPS | AVERAGE: %10.3f FPS | 5%% LOW: %6.3f FPS | LOWEST 0.5%%: %6.3f FPS"
-var ms_fmt = "%10.3f ms  | LOWEST: %6.3f ms  | AVERAGE: %10.3f ms  | 5%% LOW: %6.3f ms  | LOWEST 0.5%%: %6.3f ms "
+const AUTO_FLUSH_MAX: int = 10
+var auto_flush_ctr: int = 0
+
+var stat_id: int = randi()
+var stat_id_str: String = "%X" % [stat_id]
+const file_fmt: String = "res://%s_%s_timingStats.txt"
+const fps_fmt: String = "%8.2f FPS | LOWEST: %0.2f FPS | AVERAGE: %8.2f FPS | 5%% LOW: %0.2f FPS | LOWEST 0.5%%: %0.2f FPS"
+const ms_fmt: String = "%0.2f ms | LOWEST: %0.2f ms | AVERAGE: %0.2f ms | 5%% LOW: %0.2f ms | LOWEST 0.5%%: %0.2f ms"
 
 # Instead of 1% low FPS, we're doing a weighted average on the lowest 5%
-func CalculateLowestFPSWeightedAverage(low_frames: PackedFloat32Array) -> float:
+func LowestFpsWeightedAverage(low_frames: PackedFloat32Array) -> float:
 	var avg: float = 0.0
 	var low_frame_ct: float = TARGET_LOW_FRAME_CT
 	var half_frame_ct = low_frame_ct / 2
@@ -49,11 +55,10 @@ func CalculateLowestFPSWeightedAverage(low_frames: PackedFloat32Array) -> float:
 	slow_frame_weight /= half_frame_ct
 	for i in range(half_frame_ct, TARGET_LOW_FRAME_CT):
 		avg += low_frames[i] * slow_frame_weight
-		
 	
 	return avg
 
-func CalculateTrimmedFpsAverage(trimmed_frames: PackedFloat32Array) -> float:
+func Average(trimmed_frames: PackedFloat32Array) -> float:
 	var avg: float = 0.0
 	for frame_time: float in trimmed_frames:
 		avg += frame_time
@@ -63,13 +68,33 @@ func TabulateTimeStats() -> void:
 	avg_buffer_idx = 0
 	avg_buffer.sort()
 	lowest_avg_fps = avg_buffer[0]
-	low_avg_fps = CalculateLowestFPSWeightedAverage(avg_buffer.slice(0, TARGET_LOW_FRAME_CT))
-	trim_avg_fps = CalculateTrimmedFpsAverage(avg_buffer.slice(TARGET_LOW_FRAME_CT, (AVG_BUFFER_SIZE - TARGET_LOW_FRAME_CT)))
-	avg_buffer.fill(0.0)
+	low_avg_fps = LowestFpsWeightedAverage(avg_buffer.slice(0, TARGET_LOW_FRAME_CT))
+	trim_avg_fps = Average(avg_buffer.slice(TARGET_LOW_FRAME_CT, (AVG_BUFFER_SIZE - TARGET_LOW_FRAME_CT)))
 
 func ResetStatCollection() -> void:
 	lowest_fps = 10000000000.0
 	print("RESET DEBUG STAT COLLECTION")
+
+func FlushStatsToFile() -> void:
+	var fn: String = file_fmt % [Time.get_date_string_from_system(), stat_id_str]
+	
+	var file
+	if FileAccess.file_exists(fn):
+		file = FileAccess.open(fn, FileAccess.READ_WRITE)
+		file.seek_end()
+	else:
+		file = FileAccess.open(fn, FileAccess.WRITE_READ)
+
+	var fmt_str: String = "%.3f "
+	var data: String = fmt_str % [lowest_fps]
+	
+	for fps: float in avg_buffer:
+		data += fmt_str % [fps]
+	
+	file.store_line(data)
+	file.close()
+	
+	print("STATS FLUSHED TO FILE!")
 
 func _ready() -> void:
 	TimeStats.text = ""
@@ -79,6 +104,8 @@ func _ready() -> void:
 	
 	var file_buffer_sz: int = MinutesToTrack * SECS_PER_MIN
 	file_buffer.resize(file_buffer_sz)
+	
+	accum = -1.0
 
 func _input(event):
 	# Ctrl+Del
@@ -93,11 +120,17 @@ func _process(delta: float) -> void:
 
 	var fps: float = 1.0 / delta
 	avg_buffer[avg_buffer_idx] = fps
-	avg_buffer_idx = avg_buffer_idx + 1
+	avg_buffer_idx += 1
 	lowest_fps = fps if fps < lowest_fps else lowest_fps
 	
 	if (avg_buffer_idx >= AVG_BUFFER_SIZE):
+		
 		TabulateTimeStats()
+		
+		auto_flush_ctr += 1
+		if (auto_flush_ctr >= AUTO_FLUSH_MAX):
+			FlushStatsToFile()
+			auto_flush_ctr = 0
 	
 	if (accum >= 0.08333):
 		var fps_str = fps_fmt % [fps, lowest_fps, trim_avg_fps, low_avg_fps, lowest_avg_fps]
@@ -108,6 +141,6 @@ func _process(delta: float) -> void:
 		var low_avg_ms_per_frame: float = 1000.0 / low_avg_fps
 		var lowest_avg_ms_per_frame: float = 1000.0 / lowest_avg_fps
 		var ms_str = ms_fmt % [ms_per_frame, lowest_ms_per_frame, trim_ms_per_frame, low_avg_ms_per_frame, lowest_avg_ms_per_frame]
-		var final_str = fps_str + '\n' + ms_str
+		var final_str = fps_str + " | " + ms_str
 		TimeStats.text = final_str
 		accum = 0.0
