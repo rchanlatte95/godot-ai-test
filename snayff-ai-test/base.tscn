@@ -41,16 +41,16 @@ theme_override_constants/v_separation = 4
 custom_minimum_size = Vector2(180, 80)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 2
+size_flags_vertical = 0
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("1_e8nri")
 theme_override_font_sizes/font_size = 18
 text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus iaculis est, at iaculis turpis tempus vel. Duis in velit sed felis ultricies porttitor. Integer risus massa, hendrerit sit amet nisl at, dignissim consequat leo. Aliquam scelerisque tincidunt molestie. Aliquam erat volutpat. Donec id tempor dui. Aliquam aliquam nisl elit, a tincidunt velit placerat sit amet."
 autowrap_mode = 2
 text_overrun_behavior = 2
+max_lines_visible = 1
 
 [node name="DiagnosticMemoryStats" type="Label" parent="UI_Manager/DiagnosticAspectRatio/DiagnosticGridContainer"]
-visible = false
 custom_minimum_size = Vector2(180, 80)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -60,3 +60,4 @@ theme_override_font_sizes/font_size = 18
 text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer faucibus iaculis est, at iaculis turpis tempus vel. Duis in velit sed felis ultricies porttitor. Integer risus massa, hendrerit sit amet nisl at, dignissim consequat leo. Aliquam scelerisque tincidunt molestie. Aliquam erat volutpat. Donec id tempor dui. Aliquam aliquam nisl elit, a tincidunt velit placerat sit amet."
 autowrap_mode = 2
 text_overrun_behavior = 2
+max_lines_visible = 1

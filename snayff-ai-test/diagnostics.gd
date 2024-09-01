@@ -33,7 +33,8 @@ var current_fps_fmt = "%10.3f FPS | LOWEST: %6.3f FPS | AVERAGE: %10.3f FPS | 5%
 # Instead of 1% low FPS, we're doing a weighted average on the lowest 5%
 func CalculateLowestFPSWeightedAverage(low_frames: PackedFloat32Array) -> float:
 	var avg: float = 0.0
-	var half_frame_ct = TARGET_LOW_FRAME_CT / 2
+	var low_frame_ct: float = TARGET_LOW_FRAME_CT
+	var half_frame_ct = low_frame_ct / 2
 	
 	var slowest_frame_weight_proportion = 0.5
 	avg += low_frames[0] * slowest_frame_weight_proportion
@@ -45,10 +46,8 @@ func CalculateLowestFPSWeightedAverage(low_frames: PackedFloat32Array) -> float:
 	
 	var slow_frame_weight: float = 1.0 - (slowest_frame_weight_proportion + slower_frame_weight_proportion)
 	slow_frame_weight /= half_frame_ct
-	var test: float = 0.0
 	for i in range(half_frame_ct, TARGET_LOW_FRAME_CT):
 		avg += low_frames[i] * slow_frame_weight
-		test += slow_frame_weight
 		
 	
 	return avg
@@ -59,13 +58,17 @@ func CalculateTrimmedFpsAverage(trimmed_frames: PackedFloat32Array) -> float:
 		avg += frame_time
 	return avg / trimmed_frames.size()
 
-func TabulateTimeStats(fps: float) -> void:
+func TabulateTimeStats() -> void:
 	avg_buffer_idx = 0
 	avg_buffer.sort()
 	lowest_avg_fps = avg_buffer[0]
 	low_avg_fps = CalculateLowestFPSWeightedAverage(avg_buffer.slice(0, TARGET_LOW_FRAME_CT))
 	trim_avg_fps = CalculateTrimmedFpsAverage(avg_buffer.slice(TARGET_LOW_FRAME_CT, (AVG_BUFFER_SIZE - TARGET_LOW_FRAME_CT)))
 	avg_buffer.fill(0.0)
+
+func ResetStatCollection() -> void:
+	lowest_fps = 10000000000.0
+	print("RESET DEBUG STAT COLLECTION")
 
 func _ready() -> void:
 	TimeStats.text = ""
@@ -75,9 +78,10 @@ func _ready() -> void:
 	
 	var file_buffer_sz: int = MinutesToTrack * SECS_PER_MIN
 	file_buffer.resize(file_buffer_sz)
-	
-	accum = -5.0
-	pass
+
+func _input(event):
+	if event.is_action_pressed("ui_text_delete_word"):
+		ResetStatCollection()
 
 func _process(delta: float) -> void:
 	
@@ -91,7 +95,7 @@ func _process(delta: float) -> void:
 	lowest_fps = fps if fps < lowest_fps else lowest_fps
 	
 	if (avg_buffer_idx >= AVG_BUFFER_SIZE):
-		TabulateTimeStats(fps)
+		TabulateTimeStats()
 	
 	if (accum >= 0.08333):
 		var final_str = current_fps_fmt % [fps, lowest_fps, trim_avg_fps, low_avg_fps, lowest_avg_fps]
