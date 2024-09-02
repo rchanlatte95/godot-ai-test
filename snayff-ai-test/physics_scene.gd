@@ -1,6 +1,7 @@
 extends Node2D
 
 @export var InfoLabel: Label
+@export var SwayAndRotateTest: bool
 
 var Newton = PhysicsServer2D
 var rb_obj = preload("res://Rigidbody-Actor.tscn")
@@ -22,7 +23,8 @@ func _process(delta: float) -> void:
 		var rand_x: float = randf_range(100.0, Shrunk_screen_size.x)
 		
 		var obj = rb_obj.instantiate() as RigidbodyActor
-		obj.SpawnAsChild(self, Vector2(rand_x, 100.0))
+		
+		obj.SpawnAsChild(self, Vector2(rand_x, 100.0), SwayAndRotateTest)
 		actor_ct += 1
 		InfoLabel.text = "Actors Spawned: %d" % [actor_ct]
 		accum = 0.0
