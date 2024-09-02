@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2tdvcmkefdf3"]
+
+[ext_resource type="Script" path="res://RigidbodyActor.gd" id="1_p1knm"]
+[ext_resource type="Texture2D" uid="uid://dd0m8tiq8q4x3" path="res://icon.svg" id="2_2fv7d"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u238x"]
+size = Vector2(18, 18)
+
+[node name="Rigidbody-Actor" type="RigidBody2D" node_paths=PackedStringArray("RigidBody", "Collider", "BaseSprite")]
+script = ExtResource("1_p1knm")
+RigidBody = NodePath(".")
+Collider = NodePath("CollisionShape2D")
+BaseSprite = NodePath("Sprite2D")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_u238x")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.14, 0.14)
+texture = ExtResource("2_2fv7d")

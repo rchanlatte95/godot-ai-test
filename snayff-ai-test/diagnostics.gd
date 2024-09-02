@@ -216,6 +216,7 @@ func _process(delta: float) -> void:
 	lowest_fps = fps if fps < lowest_fps else lowest_fps
 	
 	if (avg_buffer_idx >= AVG_BUFFER_SIZE):
+		
 		TabulateTimeStats()
 		TabulatePhysicsTimeStats()
 		

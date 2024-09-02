@@ -1,11 +1,23 @@
-[gd_scene load_steps=5 format=3 uid="uid://dvafunx54qqqm"]
+[gd_scene load_steps=9 format=3 uid="uid://dvafunx54qqqm"]
 
 [ext_resource type="FontFile" uid="uid://cow454xevasx7" path="res://FiraCode-Retina.ttf" id="1_e8nri"]
 [ext_resource type="Script" path="res://diagnostics.gd" id="1_jqxe1"]
 [ext_resource type="Script" path="res://physics_scene.gd" id="3_boxhb"]
+[ext_resource type="Texture2D" uid="uid://2cp1m4jt4fmm" path="res://Pan_Blue_Circle.png" id="4_716xq"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_tgl7e"]
-size = Vector2(1742, 1056)
+[sub_resource type="Gradient" id="Gradient_b1vyg"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.3687, 0.64191, 1)
+colors = PackedColorArray(0.501407, 0.501406, 0.501406, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.501407, 0.501406, 0.501406, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_xjbjn"]
+gradient = SubResource("Gradient_b1vyg")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1c28l"]
+size = Vector2(257, 50)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wckvl"]
+radius = 129.0
 
 [node name="base" type="Node2D"]
 
@@ -94,12 +106,95 @@ max_lines_visible = 1
 
 [node name="scn" type="Node2D" parent="."]
 
-[node name="PhysicsScene" type="Node2D" parent="scn"]
+[node name="PhysicsScene" type="Node2D" parent="scn" node_paths=PackedStringArray("Boundary")]
 script = ExtResource("3_boxhb")
+Boundary = NodePath("")
 
-[node name="Area2D" type="Area2D" parent="scn/PhysicsScene"]
+[node name="Boundary" type="Sprite2D" parent="scn/PhysicsScene"]
+position = Vector2(412, 864)
+scale = Vector2(2.125, 50)
+texture = SubResource("GradientTexture1D_xjbjn")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="scn/PhysicsScene/Area2D"]
-z_as_relative = false
-position = Vector2(800, 450)
-shape = SubResource("RectangleShape2D_tgl7e")
+[node name="StaticBody2D" type="StaticBody2D" parent="scn/PhysicsScene/Boundary"]
+scale = Vector2(1, 0.02)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="scn/PhysicsScene/Boundary/StaticBody2D"]
+position = Vector2(0.499996, 0)
+shape = SubResource("RectangleShape2D_1c28l")
+
+[node name="Boundary2" type="Sprite2D" parent="scn/PhysicsScene"]
+position = Vector2(76, 614)
+rotation = 1.39626
+scale = Vector2(2.125, 50)
+texture = SubResource("GradientTexture1D_xjbjn")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="scn/PhysicsScene/Boundary2"]
+scale = Vector2(1, 0.02)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="scn/PhysicsScene/Boundary2/StaticBody2D"]
+position = Vector2(0.499996, 0)
+shape = SubResource("RectangleShape2D_1c28l")
+
+[node name="Boundary6" type="Sprite2D" parent="scn/PhysicsScene"]
+position = Vector2(946, 616)
+rotation = 1.39626
+scale = Vector2(2.125, 50)
+texture = SubResource("GradientTexture1D_xjbjn")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="scn/PhysicsScene/Boundary6"]
+scale = Vector2(1, 0.02)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="scn/PhysicsScene/Boundary6/StaticBody2D"]
+position = Vector2(0.499996, 0)
+shape = SubResource("RectangleShape2D_1c28l")
+
+[node name="Boundary3" type="Sprite2D" parent="scn/PhysicsScene"]
+position = Vector2(1249.85, 864.209)
+scale = Vector2(2.125, 50)
+texture = SubResource("GradientTexture1D_xjbjn")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="scn/PhysicsScene/Boundary3"]
+scale = Vector2(1, 0.02)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="scn/PhysicsScene/Boundary3/StaticBody2D"]
+position = Vector2(0.499996, 0)
+shape = SubResource("RectangleShape2D_1c28l")
+
+[node name="Boundary4" type="Sprite2D" parent="scn/PhysicsScene"]
+position = Vector2(1537, 614)
+rotation = 1.65155
+scale = Vector2(2.125, 50)
+texture = SubResource("GradientTexture1D_xjbjn")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="scn/PhysicsScene/Boundary4"]
+scale = Vector2(1, 0.02)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="scn/PhysicsScene/Boundary4/StaticBody2D"]
+position = Vector2(0.499996, 0)
+shape = SubResource("RectangleShape2D_1c28l")
+
+[node name="Boundary5" type="Sprite2D" parent="scn/PhysicsScene"]
+position = Vector2(693, 614)
+rotation = 1.65155
+scale = Vector2(2.125, 50)
+texture = SubResource("GradientTexture1D_xjbjn")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="scn/PhysicsScene/Boundary5"]
+scale = Vector2(1, 0.02)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="scn/PhysicsScene/Boundary5/StaticBody2D"]
+position = Vector2(0.499996, 0)
+shape = SubResource("RectangleShape2D_1c28l")
+
+[node name="CircleBoundary" type="Sprite2D" parent="scn/PhysicsScene"]
+position = Vector2(811, 345)
+scale = Vector2(0.375, 0.375)
+texture = ExtResource("4_716xq")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="scn/PhysicsScene/CircleBoundary"]
+position = Vector2(0, 10.6667)
+scale = Vector2(2.66667, 2.66667)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="scn/PhysicsScene/CircleBoundary/StaticBody2D"]
+position = Vector2(-3.8147e-06, -4)
+shape = SubResource("CircleShape2D_wckvl")
