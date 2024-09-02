@@ -34,7 +34,8 @@ limits/debugger/max_warnings_per_second=1024
 
 [physics]
 
-common/physics_jitter_fix=400.0
+common/physics_ticks_per_second=128
+common/max_physics_steps_per_frame=2
 common/quality/msaa_2d=0
 
 [rendering]
