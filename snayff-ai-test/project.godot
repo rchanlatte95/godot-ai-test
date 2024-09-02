@@ -15,11 +15,22 @@ run/main_scene="res://base.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[debug]
+
+file_logging/enable_file_logging=true
+
 [display]
 
 window/size/viewport_width=1600
 window/size/viewport_height=900
 window/vsync/vsync_mode=0
+
+[network]
+
+limits/debugger/max_chars_per_second=16777216
+limits/debugger/max_queued_messages=4096
+limits/debugger/max_errors_per_second=1024
+limits/debugger/max_warnings_per_second=1024
 
 [physics]
 
