@@ -23,7 +23,6 @@ window/vsync/vsync_mode=0
 
 [physics]
 
-common/physics_ticks_per_second=120
 common/physics_jitter_fix=400.0
 common/quality/msaa_2d=0
 

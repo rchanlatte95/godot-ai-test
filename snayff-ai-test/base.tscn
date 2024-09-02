@@ -46,7 +46,7 @@ MemStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/Diagnos
 PhysicsTimeStats = NodePath("DiagnosticPanel/MarginContainer/DiagnosticContainer/DiagnosticPhysicsTimeStats")
 
 [node name="DiagnosticPanel" type="PanelContainer" parent="UI_Manager/DiagnosticAspectRatio"]
-self_modulate = Color(1, 1, 1, 0.25098)
+self_modulate = Color(0.501407, 0.501406, 0.501406, 0.25098)
 layout_mode = 2
 size_flags_vertical = 0
 
@@ -104,11 +104,41 @@ autowrap_mode = 2
 text_overrun_behavior = 2
 max_lines_visible = 1
 
+[node name="PanelContainer" type="PanelContainer" parent="UI_Manager"]
+self_modulate = Color(0.501407, 0.501406, 0.501406, 0.25098)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.015
+anchor_top = 0.1
+anchor_right = 0.2
+anchor_bottom = 0.146
+
+[node name="MarginContainer" type="MarginContainer" parent="UI_Manager/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="ActorInfoLabel" type="Label" parent="UI_Manager/PanelContainer/MarginContainer"]
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_e8nri")
+theme_override_font_sizes/font_size = 14
+text = "Actors Spawned: "
+vertical_alignment = 1
+autowrap_mode = 2
+text_overrun_behavior = 2
+max_lines_visible = 1
+
 [node name="scn" type="Node2D" parent="."]
 
-[node name="PhysicsScene" type="Node2D" parent="scn" node_paths=PackedStringArray("Boundary")]
+[node name="PhysicsScene" type="Node2D" parent="scn" node_paths=PackedStringArray("InfoLabel")]
 script = ExtResource("3_boxhb")
-Boundary = NodePath("")
+InfoLabel = NodePath("../../UI_Manager/PanelContainer/MarginContainer/ActorInfoLabel")
 
 [node name="Boundary" type="Sprite2D" parent="scn/PhysicsScene"]
 position = Vector2(412, 864)

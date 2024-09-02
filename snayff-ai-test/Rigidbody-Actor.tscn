@@ -7,6 +7,8 @@
 size = Vector2(18, 18)
 
 [node name="Rigidbody-Actor" type="RigidBody2D" node_paths=PackedStringArray("RigidBody", "Collider", "BaseSprite")]
+contact_monitor = true
+max_contacts_reported = 16
 script = ExtResource("1_p1knm")
 RigidBody = NodePath(".")
 Collider = NodePath("CollisionShape2D")
