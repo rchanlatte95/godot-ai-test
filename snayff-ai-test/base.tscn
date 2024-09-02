@@ -139,7 +139,8 @@ max_lines_visible = 1
 [node name="PhysicsScene" type="Node2D" parent="scn" node_paths=PackedStringArray("InfoLabel")]
 script = ExtResource("3_boxhb")
 InfoLabel = NodePath("../../UI_Manager/PanelContainer/MarginContainer/ActorInfoLabel")
-SwayAndRotateTest = true
+SwayAndRotate = true
+RandomizeMassAndGravity = true
 
 [node name="Boundary" type="Sprite2D" parent="scn/PhysicsScene"]
 position = Vector2(412, 864)

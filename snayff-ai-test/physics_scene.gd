@@ -1,13 +1,14 @@
 extends Node2D
 
 @export var InfoLabel: Label
-@export var SwayAndRotateTest: bool
+@export var SwayAndRotate: bool
+@export var RandomizeMassAndGravity: bool
 
 var Newton = PhysicsServer2D
 var rb_obj = preload("res://Rigidbody-Actor.tscn")
 
 var INSTANCE_CTR: int = 0
-const SPAWN_RATE: float = 1.0 / 5.0
+const SPAWN_RATE: float = 1.0 / 25.0
 var actor_ct: int = 0
 var accum: float = 0.0
 
@@ -24,7 +25,7 @@ func _process(delta: float) -> void:
 		
 		var obj = rb_obj.instantiate() as RigidbodyActor
 		
-		obj.SpawnAsChild(self, Vector2(rand_x, 100.0), SwayAndRotateTest)
+		obj.SpawnAsChild(self, Vector2(rand_x, 100.0), SwayAndRotate, RandomizeMassAndGravity)
 		actor_ct += 1
 		InfoLabel.text = "Actors Spawned: %d" % [actor_ct]
 		accum = 0.0
